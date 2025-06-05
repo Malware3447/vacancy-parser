@@ -8,6 +8,5 @@ database:
   user: demo
   password: demo
   schema: public
-  migrationPath: migrations/pg
   maxAttempts: 5
   attemptDelay: 5s
