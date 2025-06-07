@@ -3,12 +3,13 @@ package models
 import "github.com/PuerkitoBio/goquery"
 
 type ListParamsQuery struct {
-	Items    string
-	Link     string
-	Title    string
-	Salary   string
-	Company  string
-	Location string
+	Items      string
+	Link       string
+	Title      string
+	Salary     string
+	Company    string
+	Location   string
+	Experience string
 }
 
 type ItemsList struct {

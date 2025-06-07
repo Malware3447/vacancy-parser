@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"vacancy-parser/internal/config"
 	"vacancy-parser/internal/models"
+	"vacancy-parser/internal/parser"
 )
 
 type HhParser struct {
@@ -39,7 +40,7 @@ func (h *HhParser) LoadAndCollect(ctx context.Context, path string) error {
 		return fmt.Errorf("ошибка при загрузке документа: %v", err)
 	}
 
-	_, err = h.getItems(ctx, doc)
+	items, err := h.getItems(ctx, doc)
 	if err != nil {
 		return fmt.Errorf("ошибка при сборе данных: %v", err)
 	}
@@ -77,17 +78,18 @@ func (h *HhParser) getItems(ctx context.Context, doc *goquery.Document) ([]*mode
 	const op = "parser.hh.getItems"
 	ctx = h.logger.NewOpCtx(ctx, op)
 
-	selection := models.ItemsList{}
+	selections := models.ItemsList{}
 	items := make([]*models.ItemsModel, 0)
 
-	selection.Items = doc.Find(h.query.Items)
+	selections.Items = doc.Find(h.query.Items)
 
 	errorMap := make(map[int]error)
-	selection.Items.Each(func(index int, selection *goquery.Selection) {
+	selections.Items.Each(func(index int, e *goquery.Selection) {
 
-		item := ParseListItems(
+		item := parser.ParseListItems(
 			index,
-			selection,
+			e,
+			&selections,
 			h.query,
 			errorMap,
 		)
