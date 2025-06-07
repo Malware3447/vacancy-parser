@@ -10,7 +10,3 @@ database:
   schema: public
   maxAttempts: 5
   attemptDelay: 5s
-
-parser:
-  hh:
-    url: "https://hh.ru/search/vacancy?enable_snippets=false&L_save_area=true&area=113&experience=between1And3&professional_role=96&search_field=name&search_field=company_name&search_field=description&text=golang"
