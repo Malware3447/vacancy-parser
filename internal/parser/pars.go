@@ -14,21 +14,19 @@ import (
 type Parser struct {
 	cfg    *config.Config
 	query  *models.ListParamsQuery
-	repo   pg.Service
+	repo   *pg.Service
 	logger logit.Logger
 }
 
 type Params struct {
 	Cfg    *config.Config
-	Query  *models.ListParamsQuery
-	Repo   pg.Service
+	Repo   *pg.Service
 	Logger logit.Logger
 }
 
-func NewHhParser(ctx context.Context, params Params) *Parser {
+func NewParser(ctx context.Context, params *Params) *Parser {
 	return &Parser{
 		cfg:    params.Cfg,
-		query:  params.Query,
 		repo:   params.Repo,
 		logger: params.Logger,
 	}

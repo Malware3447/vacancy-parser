@@ -15,5 +15,5 @@ func NewService(repo pg.Repository) *Service {
 }
 
 func (s *Service) AddVacancies(ctx context.Context, params models.Vacancy) (id int32, err error) {
-	return s.repo.AddVacancies(ctx, params)
+	return s.repo.AddVacancy(ctx, params)
 }

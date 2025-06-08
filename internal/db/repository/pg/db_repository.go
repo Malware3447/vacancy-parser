@@ -16,7 +16,7 @@ func NewRepositoryPg(db *pgxpool.Pool) Repository {
 	return &RepositoryPg{db: db}
 }
 
-func (r *RepositoryPg) AddVacancies(ctx context.Context, params models.Vacancy) (id int32, err error) {
+func (r *RepositoryPg) AddVacancy(ctx context.Context, params models.Vacancy) (id int32, err error) {
 	const q = `
 	INSERT INTO vacancy (title, skills, salary, company, location, experience, source_id, created_at)
     VALUES ($1, $2, $3, $4, $5, $6, $7)

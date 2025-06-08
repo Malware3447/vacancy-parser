@@ -8,16 +8,16 @@ import (
 )
 
 type Sources struct {
-	prs    parser.Parser
+	prs    *parser.Parser
 	logger logit.Logger
 }
 
 type Params struct {
-	Prs    parser.Parser
+	Prs    *parser.Parser
 	Logger logit.Logger
 }
 
-func NewSources(params Params) *Sources {
+func NewSources(params *Params) *Sources {
 	return &Sources{
 		prs:    params.Prs,
 		logger: params.Logger,
