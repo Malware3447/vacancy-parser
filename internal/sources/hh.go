@@ -11,8 +11,8 @@ func NewHh(baseUrl string) *models.ItemParams {
 			Title:      "h2 a",
 			Salary:     ".magritte-text_typography-label-1-regular___pi3R-_3-0-41",
 			Company:    "span[data-qa=vacancy-serp__vacancy-employer-text]",
-			Location:   "",
-			Experience: "",
+			Location:   "span[data-qa=vacancy-serp__vacancy-address]",
+			Experience: "span[data-qa=vacancy-serp__vacancy-work-experience-between1And3]",
 		},
 	}
 }

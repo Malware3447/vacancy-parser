@@ -4,7 +4,7 @@ type Vacancy struct {
 	Id          int32
 	Url         string
 	Title       string
-	Salary      int32
+	Salary      string
 	Company     string
 	Location    string
 	Experiences string

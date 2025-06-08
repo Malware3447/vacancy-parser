@@ -3,7 +3,6 @@ package parser
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"strconv"
 	"strings"
 	"vacancy-parser/internal/models"
 )
@@ -22,12 +21,11 @@ func ParseListItems(index int, e *goquery.Selection, selection *models.ItemsList
 	}
 
 	selection.Salary = e.Find(query.Salary)
-	if selection.Salary == nil {
-		item.Salary = -1
+	if selection.Salary == nil || selection.Salary.Length() == 0 {
+		item.Salary = "не указано"
 	} else {
-		salaryText := strings.TrimSpace(selection.Salary.Text())
-		salary, _ := strconv.Atoi(salaryText)
-		item.Salary = int32(salary)
+		salary := strings.TrimSpace(selection.Salary.Text())
+		item.Salary = salary
 	}
 
 	selection.Company = e.Find(query.Company)

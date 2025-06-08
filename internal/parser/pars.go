@@ -13,7 +13,6 @@ import (
 
 type Parser struct {
 	cfg    *config.Config
-	query  *models.ListParamsQuery
 	repo   *pg.Service
 	logger logit.Logger
 }
@@ -32,16 +31,16 @@ func NewParser(ctx context.Context, params *Params) *Parser {
 	}
 }
 
-func (h *Parser) LoadAndCollect(ctx context.Context, path string) error {
+func (h *Parser) LoadAndCollect(ctx context.Context, itemParams *models.ItemParams) error {
 	const op = "parser.hh.LoadAndCollect"
 	ctx = h.logger.NewOpCtx(ctx, op)
 
-	doc, err := h.LoadDoc(ctx, path)
+	doc, err := h.LoadDoc(ctx, itemParams.BaseUrl)
 	if err != nil {
 		return fmt.Errorf("ошибка при загрузке документа: %v", err)
 	}
 
-	items, err := h.getItems(ctx, doc)
+	items, err := h.getItems(ctx, doc, itemParams)
 	if err != nil {
 		return fmt.Errorf("ошибка при сборе данных: %v", err)
 	}
@@ -76,19 +75,19 @@ func (h *Parser) LoadDoc(ctx context.Context, path string) (*goquery.Document, e
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 
-	h.logger.Info(ctx, fmt.Sprintf("Загрузка страницы завершена: %v", path))
+	h.logger.Info(ctx, fmt.Sprintf("Загрузка страницы завершена"))
 
 	return doc, nil
 }
 
-func (h *Parser) getItems(ctx context.Context, doc *goquery.Document) ([]*models.ItemsModel, error) {
+func (h *Parser) getItems(ctx context.Context, doc *goquery.Document, itemParams *models.ItemParams) ([]*models.ItemsModel, error) {
 	const op = "parser.hh.getItems"
 	ctx = h.logger.NewOpCtx(ctx, op)
 
 	selections := models.ItemsList{}
 	items := make([]*models.ItemsModel, 0)
 
-	selections.Items = doc.Find(h.query.Items)
+	selections.Items = doc.Find(itemParams.Query.Items)
 
 	errorMap := make(map[int]error)
 	selections.Items.Each(func(index int, e *goquery.Selection) {
@@ -97,7 +96,7 @@ func (h *Parser) getItems(ctx context.Context, doc *goquery.Document) ([]*models
 			index,
 			e,
 			&selections,
-			h.query,
+			&itemParams.Query,
 			errorMap,
 		)
 
@@ -111,6 +110,8 @@ func (h *Parser) getItems(ctx context.Context, doc *goquery.Document) ([]*models
 		err := fmt.Errorf("ошибки при парсинге: %+v", errorMap)
 		return nil, err
 	}
+
+	h.logger.Info(ctx, fmt.Sprintf("Найдено %d вакансий", len(items)))
 
 	return items, nil
 }
@@ -128,8 +129,13 @@ func (h *Parser) UpdateVacancies(ctx context.Context, items []*models.ItemsModel
 
 		_, err := h.repo.AddVacancies(ctx, vacancy)
 		if err != nil {
-			return fmt.Errorf("ошибка добавления вакансии: %w", err)
+			h.logger.Error(ctx, fmt.Errorf("Ошибка при добавлении вакансии: %v", err))
+			err = fmt.Errorf("ошибка добавления вакансии: %w", err)
+			return err
 		}
 	}
+
+	h.logger.Info(ctx, fmt.Sprintf("Добавлено %d вакансий в БД", len(items)))
+
 	return nil
 }

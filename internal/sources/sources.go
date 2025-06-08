@@ -39,9 +39,9 @@ func (s *Sources) Parse(ctx context.Context) error {
 
 	hhUrl := "https://voronezh.hh.ru/search/vacancy?hhtmFrom=main&hhtmFromLabel=vacancy_search_line&enable_snippets=false&L_save_area=true&experience=between1And3&search_field=name&search_field=company_name&search_field=description&text=golang"
 
-	NewHh(hhUrl)
+	itemParams := NewHh(hhUrl)
 
-	err := s.prs.LoadAndCollect(ctx, hhUrl)
+	err := s.prs.LoadAndCollect(ctx, itemParams)
 	if err != nil {
 		err = fmt.Errorf("ошибка при парсинге hh.ru: %v", err)
 		return err

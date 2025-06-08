@@ -31,5 +31,10 @@ func (a *App) Init(ctx context.Context) error {
 	const op = "app.Init"
 	ctx = a.logger.NewOpCtx(ctx, op)
 
+	err := a.src.Init(ctx)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
