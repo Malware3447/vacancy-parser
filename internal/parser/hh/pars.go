@@ -11,27 +11,27 @@ import (
 	"vacancy-parser/internal/parser"
 )
 
-type HhParser struct {
+type Parser struct {
 	cfg    *config.Config
 	query  *models.ListParamsQuery
 	logger logit.Logger
 }
 
-type HhParams struct {
+type Params struct {
 	Cfg    *config.Config
 	Query  *models.ListParamsQuery
 	Logger logit.Logger
 }
 
-func NewHhParser(ctx context.Context, params HhParams) *HhParser {
-	return &HhParser{
+func NewHhParser(ctx context.Context, params Params) *Parser {
+	return &Parser{
 		cfg:    params.Cfg,
 		query:  params.Query,
 		logger: params.Logger,
 	}
 }
 
-func (h *HhParser) LoadAndCollect(ctx context.Context, path string) error {
+func (h *Parser) LoadAndCollect(ctx context.Context, path string) error {
 	const op = "parser.hh.LoadAndCollect"
 	ctx = h.logger.NewOpCtx(ctx, op)
 
@@ -47,7 +47,7 @@ func (h *HhParser) LoadAndCollect(ctx context.Context, path string) error {
 	return nil
 }
 
-func (h *HhParser) LoadDoc(ctx context.Context, path string) (*goquery.Document, error) {
+func (h *Parser) LoadDoc(ctx context.Context, path string) (*goquery.Document, error) {
 	const op = "parser.hh.LoadDoc"
 	ctx = h.logger.NewOpCtx(ctx, op)
 
@@ -74,7 +74,7 @@ func (h *HhParser) LoadDoc(ctx context.Context, path string) (*goquery.Document,
 	return doc, nil
 }
 
-func (h *HhParser) getItems(ctx context.Context, doc *goquery.Document) ([]*models.ItemsModel, error) {
+func (h *Parser) getItems(ctx context.Context, doc *goquery.Document) ([]*models.ItemsModel, error) {
 	const op = "parser.hh.getItems"
 	ctx = h.logger.NewOpCtx(ctx, op)
 
