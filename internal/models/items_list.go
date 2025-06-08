@@ -2,6 +2,11 @@ package models
 
 import "github.com/PuerkitoBio/goquery"
 
+type ItemParams struct {
+	BaseUrl string
+	Query   ListParamsQuery
+}
+
 type ListParamsQuery struct {
 	Items      string
 	Link       string

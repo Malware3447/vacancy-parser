@@ -2,9 +2,9 @@ package pg
 
 import (
 	"context"
-	"vacancy-parser/internal/structs/vacancy"
+	"vacancy-parser/internal/models"
 )
 
 type Repository interface {
-	AddVacancy(ctx context.Context, params vacancy.Vacancy) (id int32, err error)
+	AddVacancies(ctx context.Context, params models.Vacancy) (id int32, err error)
 }

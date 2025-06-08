@@ -1,9 +1,9 @@
-package vacancy
+package models
 
 type Vacancy struct {
 	Id          int32
+	Url         string
 	Title       string
-	Skills      []string
 	Salary      int32
 	Company     string
 	Location    string

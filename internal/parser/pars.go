@@ -1,4 +1,4 @@
-package hh
+package parser
 
 import (
 	"context"
@@ -8,18 +8,20 @@ import (
 	"net/http"
 	"vacancy-parser/internal/config"
 	"vacancy-parser/internal/models"
-	"vacancy-parser/internal/parser"
+	"vacancy-parser/internal/services/db/pg"
 )
 
 type Parser struct {
 	cfg    *config.Config
 	query  *models.ListParamsQuery
+	repo   pg.Service
 	logger logit.Logger
 }
 
 type Params struct {
 	Cfg    *config.Config
 	Query  *models.ListParamsQuery
+	Repo   pg.Service
 	Logger logit.Logger
 }
 
@@ -27,6 +29,7 @@ func NewHhParser(ctx context.Context, params Params) *Parser {
 	return &Parser{
 		cfg:    params.Cfg,
 		query:  params.Query,
+		repo:   params.Repo,
 		logger: params.Logger,
 	}
 }
@@ -44,6 +47,12 @@ func (h *Parser) LoadAndCollect(ctx context.Context, path string) error {
 	if err != nil {
 		return fmt.Errorf("ошибка при сборе данных: %v", err)
 	}
+
+	err = h.UpdateVacancies(ctx, items)
+	if err != nil {
+		return fmt.Errorf("ошибка при добавлении вакансий в БД: %v", err)
+	}
+
 	return nil
 }
 
@@ -86,7 +95,7 @@ func (h *Parser) getItems(ctx context.Context, doc *goquery.Document) ([]*models
 	errorMap := make(map[int]error)
 	selections.Items.Each(func(index int, e *goquery.Selection) {
 
-		item := parser.ParseListItems(
+		item := ParseListItems(
 			index,
 			e,
 			&selections,
@@ -106,4 +115,23 @@ func (h *Parser) getItems(ctx context.Context, doc *goquery.Document) ([]*models
 	}
 
 	return items, nil
+}
+
+func (h *Parser) UpdateVacancies(ctx context.Context, items []*models.ItemsModel) error {
+	for _, item := range items {
+		vacancy := models.Vacancy{
+			Url:         item.Url,
+			Title:       item.Title,
+			Company:     item.Company,
+			Salary:      item.Salary,
+			Location:    item.Location,
+			Experiences: item.Experience,
+		}
+
+		_, err := h.repo.AddVacancies(ctx, vacancy)
+		if err != nil {
+			return fmt.Errorf("ошибка добавления вакансии: %w", err)
+		}
+	}
+	return nil
 }
