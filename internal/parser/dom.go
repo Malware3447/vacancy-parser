@@ -7,8 +7,30 @@ import (
 	"vacancy-parser/internal/models"
 )
 
+func splitAndTakeFirst(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	return s[:len(s)/2]
+}
+
 func ParseListItems(index int, e *goquery.Selection, selection *models.ItemsList, query *models.ListParamsQuery, errorMap map[int]error) *models.ItemsModel {
 	item := new(models.ItemsModel)
+
+	selection.Link = e.Find(query.Link)
+	if selection.Link.Length() == 0 {
+		err := fmt.Errorf("ошибка при получении ссылки на вакансию")
+		errorMap[index] = err
+		return nil
+	} else {
+		href, exists := selection.Link.Attr("href")
+		if !exists {
+			err := fmt.Errorf("атрибут href не найден")
+			errorMap[index] = err
+			return nil
+		}
+		item.Url = href
+	}
 
 	selection.Title = e.Find(query.Title)
 	if selection.Title == nil {
@@ -25,6 +47,7 @@ func ParseListItems(index int, e *goquery.Selection, selection *models.ItemsList
 		item.Salary = "не указано"
 	} else {
 		salary := strings.TrimSpace(selection.Salary.Text())
+		salary = splitAndTakeFirst(salary)
 		item.Salary = salary
 	}
 
@@ -35,6 +58,7 @@ func ParseListItems(index int, e *goquery.Selection, selection *models.ItemsList
 		return nil
 	} else {
 		company := strings.TrimSpace(selection.Company.Text())
+		company = splitAndTakeFirst(company)
 		item.Company = company
 	}
 
@@ -45,6 +69,8 @@ func ParseListItems(index int, e *goquery.Selection, selection *models.ItemsList
 		return nil
 	} else {
 		location := strings.TrimSpace(selection.Location.Text())
+		location = splitAndTakeFirst(location)
+		location = splitAndTakeFirst(location)
 		item.Location = location
 	}
 
@@ -55,10 +81,9 @@ func ParseListItems(index int, e *goquery.Selection, selection *models.ItemsList
 		return nil
 	} else {
 		experience := strings.TrimSpace(selection.Experience.Text())
+		experience = splitAndTakeFirst(experience)
 		item.Experience = experience
 	}
-
-	item.Url = query.Link
 
 	return item
 }
